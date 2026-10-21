@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f3d3e">
+<title>Saham Saya</title>
+<style>
+:root{--bg:#f3f6f5;--card:#fff;--ink:#14282a;--mute:#5f7476;--line:#dbe4e2;--main:#0f6b66;--up:#0a7d4b;--down:#b3372f;--nav:#0f3d3e}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1819;--card:#142526;--ink:#e6f0ee;--mute:#92a9a7;--line:#25393a;--main:#4cc2b6;--up:#4cd28e;--down:#ff8a80;--nav:#091213}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--nav);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;display:flex;gap:8px;align-items:center}
+header h1{font-size:17px;margin:0;flex:1}
+header button{background:#ffffff22;border:0;border-radius:8px;padding:6px 10px;color:#fff;font:inherit}
+main{padding:12px;max-width:640px;margin:auto}
+h2{font-size:15px;margin:18px 2px 8px;color:var(--mute);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+small,.k{display:block;color:var(--mute);font-size:12px}
+.up{color:var(--up)}.down{color:var(--down)}
+.big{font-size:20px;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.r{text-align:right}
+.top{display:flex;justify-content:space-between;align-items:baseline}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.log{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px;font-size:13px;color:var(--mute)}
+.empty{color:var(--mute);text-align:center;padding:24px 10px}
+.note{color:var(--mute);font-size:12px;text-align:center;margin:14px 0 30px}
+#login{max-width:340px;margin:12vh auto 0;padding:0 16px}
+#login .card{padding:20px}
+#login h1{margin:0 0 4px;font-size:20px}
+label{display:block;font-size:13px;color:var(--mute);margin-top:12px}
+input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.go{width:100%;margin-top:16px;padding:12px;border:0;border-radius:8px;background:var(--main);color:#fff;font:inherit;font-weight:600}
+.go:disabled{opacity:.6}
+#err{color:var(--down);min-height:20px;margin-top:10px;font-size:14px}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="card">
+    <h1>Saham Saya</h1>
+    <small>Masuk untuk melihat portofolio Anda</small>
+    <label>Username<input id="u" autocomplete="username" autocapitalize="none"></label>
+    <label>Sandi<input id="p" type="password" autocomplete="current-password"></label>
+    <button class="go" id="btn">Masuk</button>
+    <div id="err"></div>
+  </div>
+</div>
+
+<div id="view" hidden>
+  <header><h1 id="hi"></h1><button id="re">Muat ulang</button><button id="out">Keluar</button></header>
+  <main id="app"></main>
+</div>
+
+<script src="config.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const rp = n => (n < 0 ? '-' : '') + 'Rp' + Math.round(Math.abs(n)).toLocaleString('id-ID');
+const pct = n => (n >= 0 ? '+' : '') + n.toFixed(2).replace('.', ',') + '%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls = n => (n >= 0 ? 'up' : 'down');
+const byDate = (a, b) => a.Tanggal < b.Tanggal ? -1 : a.Tanggal > b.Tanggal ? 1 : a.ID - b.ID;
+
+async function call(body) {
+  if (typeof API_URL === 'undefined' || !API_URL.startsWith('http')) throw new Error('Alamat server belum diatur (config.js)');
+  const r = await fetch(API_URL, {method: 'POST', body: JSON.stringify(body)});
+  const j = await r.json();
+  if (j.error) { const e = new Error(j.error); e.habis = j.habis; throw e; }
+  return j;
+}
+
+function keluar() { sessionStorage.removeItem('sesi'); $('#view').hidden = true; $('#login').style.display = ''; $('#p').value = ''; }
+
+function tampil(D) {
+  $('#login').style.display = 'none'; $('#view').hidden = false;
+  $('#hi').textContent = 'Halo, ' + D.owner;
+  const m = {};
+  D.tx.slice().sort(byDate).forEach(t => {
+    const h = m[t.Kode] ??= {kode: t.Kode, sh: 0, cost: 0, real: 0};
+    const n = Number(t.Lembar), p = Number(t.Harga), f = Number(t.Biaya) || 0;
+    if (t.Jenis === 'Beli') { h.sh += n; h.cost += n * p + f; }
+    else { const avg = h.sh ? h.cost / h.sh : 0; h.real += n * p - f - avg * n; h.cost -= avg * n; h.sh -= n; }
+  });
+  const all = Object.values(m), hs = all.filter(h => h.sh > 0).sort((a, b) => a.kode.localeCompare(b.kode));
+  const priced = hs.filter(h => D.hg[h.kode]);
+  const modal = hs.reduce((a, h) => a + h.cost, 0);
+  const nilai = priced.reduce((a, h) => a + D.hg[h.kode] * h.sh, 0);
+  const modalP = priced.reduce((a, h) => a + h.cost, 0);
+  const fl = nilai - modalP, real = all.reduce((a, h) => a + h.real, 0), dv = D.div.reduce((a, d) => a + d.Jumlah, 0);
+
+  $('#app').innerHTML = `
+  <div class="card"><div class="grid">
+    <div><small>Nilai saham sekarang</small><span class="big">${rp(nilai)}</span></div>
+    <div><small>Untung/rugi belum terjual</small><span class="big ${cls(fl)}">${rp(fl)}</span><small class="${cls(fl)}">${modalP ? pct(fl / modalP * 100) : ''}</small></div>
+    <div><small>Modal tertanam</small>${rp(modal)}</div>
+    <div><small>Dividen diterima</small>${rp(dv)}</div>
+    <div><small>Laba/rugi sudah terjual</small><span class="${cls(real)}">${rp(real)}</span></div>
+    <div><small>Total keseluruhan</small><b class="${cls(fl + real + dv)}">${rp(fl + real + dv)}</b></div>
+  </div>${hs.length > priced.length ? `<small style="margin-top:8px">${hs.length - priced.length} saham belum ada harga sekarang.</small>` : ''}</div>
+
+  <h2>Saham yang dimiliki</h2>
+  ${hs.length ? hs.map(h => {
+    const px = D.hg[h.kode], val = px ? px * h.sh : null, pl = px ? val - h.cost : null;
+    const log = D.tx.filter(t => t.Kode === h.kode).sort(byDate).reverse().map(t => `<div>${t.Tanggal} · ${t.Jenis} ${t.Lembar / 100} lot @ ${rp(t.Harga)}</div>`).join('');
+    return `<details class="card"><summary><div class="top"><b>${esc(h.kode)}</b><span>${h.sh / 100} lot</span></div>
+      <div class="grid" style="margin-top:6px">
+        <div><small>Harga beli rata-rata</small>${rp(h.cost / h.sh)}</div>
+        <div><small>Harga sekarang</small>${px ? rp(px) : '<span class="down">belum ada</span>'}</div>
+        <div><small>Modal</small>${rp(h.cost)}</div>
+        <div><small>Nilai sekarang</small>${px ? rp(val) : '-'}</div>
+      </div>
+      <div style="margin-top:8px"><small>Untung/rugi</small>${px ? `<b class="${cls(pl)}">${rp(pl)} (${pct(pl / h.cost * 100)})</b>` : '-'}</div></summary>
+      <div class="log">${log}</div></details>`;
+  }).join('') : '<div class="empty">Belum ada saham yang dipegang.</div>'}
+
+  <h2>Dividen</h2>
+  ${D.div.length ? `<div class="card">${D.div.slice().sort(byDate).reverse().map(d => `<div class="row"><div><b>${esc(d.Kode)}</b><small>${d.Tanggal} · ${d.Lembar / 100} lot</small></div><b class="up">${rp(d.Jumlah)}</b></div>`).join('')}</div>`
+    : '<div class="empty">Belum ada dividen.</div>'}
+
+  <h2>Riwayat transaksi</h2>
+  ${D.tx.length ? `<div class="card">${D.tx.slice().sort(byDate).reverse().map(t => `<div class="row"><div><b class="${t.Jenis === 'Beli' ? 'up' : 'down'}">${t.Jenis}</b> ${esc(t.Kode)}<small>${t.Tanggal}</small></div><div class="r">${t.Lembar / 100} lot<small>@ ${rp(t.Harga)}</small></div></div>`).join('')}</div>`
+    : '<div class="empty">Belum ada transaksi.</div>'}
+  <div class="note">Harga dari Google Finance, bisa tertunda ±20 menit. Halaman ini hanya untuk melihat.</div>`;
+}
+
+async function muat() {
+  try { tampil(await call({action: 'lihat', sesi: sessionStorage.getItem('sesi')})); }
+  catch (e) { if (e.habis) keluar(); else $('#app').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+async function masuk() {
+  const b = $('#btn'); b.disabled = true; $('#err').textContent = '';
+  try {
+    const j = await call({action: 'login', username: $('#u').value, sandi: $('#p').value});
+    sessionStorage.setItem('sesi', j.sesi); tampil(j);
+  } catch (e) { $('#err').textContent = e.message; }
+  b.disabled = false;
+}
+$('#btn').onclick = masuk;
+$('#p').onkeydown = e => { if (e.key === 'Enter') masuk(); };
+$('#re').onclick = muat;
+$('#out').onclick = keluar;
+if (sessionStorage.getItem('sesi')) muat();
+</script>
+</body>
+</html>
