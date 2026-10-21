@@ -4,72 +4,39 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f3d3e">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Catatan Saham</title>
+<title>Saham Saya</title>
 <style>
 :root{--bg:#f3f6f5;--card:#fff;--ink:#14282a;--mute:#5f7476;--line:#dbe4e2;--main:#0f6b66;--up:#0a7d4b;--down:#b3372f;--nav:#0f3d3e}
 @media (prefers-color-scheme:dark){:root{--bg:#0d1819;--card:#142526;--ink:#e6f0ee;--mute:#92a9a7;--line:#25393a;--main:#4cc2b6;--up:#4cd28e;--down:#ff8a80;--nav:#091213}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:84px}
-header{position:sticky;top:0;background:var(--nav);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;gap:8px;align-items:center;z-index:5}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--nav);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;display:flex;gap:8px;align-items:center}
 header h1{font-size:17px;margin:0;flex:1}
-select,input,button{font:inherit;color:var(--ink)}
-header select{background:#ffffff22;color:#fff;border:0;border-radius:8px;padding:6px 8px}
-header select option{color:#000}
-header button{background:#ffffff22;border:0;border-radius:8px;padding:6px 9px;color:#fff}
+header button{background:#ffffff22;border:0;border-radius:8px;padding:6px 10px;color:#fff;font:inherit}
 main{padding:12px;max-width:640px;margin:auto}
+h2{font-size:15px;margin:18px 2px 8px;color:var(--mute);font-weight:600}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
-.card h3{margin:0 0 8px;font-size:16px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
-.grid small,.k{display:block;color:var(--mute);font-size:12px}
+small,.k{display:block;color:var(--mute);font-size:12px}
 .up{color:var(--up)}.down{color:var(--down)}
 .big{font-size:20px;font-weight:700}
 .row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
 .row:first-child{border-top:0}
-.row small{color:var(--mute)}
 .r{text-align:right}
-.hold summary{list-style:none;cursor:pointer}
-.hold summary::-webkit-details-marker{display:none}
-.hold .top{display:flex;justify-content:space-between;align-items:baseline}
-.hold .tx{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px;font-size:13px;color:var(--mute)}
-.note{color:var(--mute);font-size:12px;margin:2px 2px 10px}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
-nav button{flex:1;background:none;border:0;color:#9db8b5;padding:12px 0;font-size:13px}
-nav button.on{color:#fff;font-weight:600;box-shadow:inset 0 3px 0 #4cc2b6}
-.fab{position:fixed;right:14px;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--main);color:#fff;border:0;border-radius:28px;padding:12px 18px;font-weight:600;z-index:6;box-shadow:0 3px 10px #0004}
-dialog{border:0;border-radius:14px;background:var(--card);color:var(--ink);width:min(92vw,420px);padding:16px}
-dialog::backdrop{background:#0008}
-label{display:block;font-size:13px;color:var(--mute);margin-top:10px}
-input,dialog select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
-.btns{display:flex;gap:8px;margin-top:14px}
-.btns button,.menu button{flex:1;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
-.btns .ok{background:var(--main);color:#fff;border:0;font-weight:600}
-.menu{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.del{background:none;border:0;color:var(--down);font-size:12px;padding:0}
-.empty{color:var(--mute);text-align:center;padding:28px 10px}
-#msg{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;z-index:200;display:none}
-#lock{position:fixed;inset:0;background:radial-gradient(circle at 15% 10%,#1d7a73 0,transparent 45%),radial-gradient(circle at 90% 95%,#e0a13a40 0,transparent 40%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%23ffffff' stroke-opacity='.08' stroke-width='2' fill='none'%3E%3Cpath d='M8 98 L34 66 L60 80 L100 28'/%3E%3Cpath d='M20 18v34M72 70v36M92 52v34'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='.07'%3E%3Crect x='14' y='26' width='12' height='16'/%3E%3Crect x='66' y='80' width='12' height='14'/%3E%3Crect x='86' y='60' width='12' height='14'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(160deg,#0a2b2c,#0f3d3e 55%,#0a2224);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.lbox{width:min(100%,320px);display:flex;flex-direction:column;gap:10px;color:#fff;text-align:center;background:#0a2224aa;padding:26px 22px;border-radius:16px;border:1px solid #ffffff26;backdrop-filter:blur(6px)}
-.lbox h2{margin:0}
-.lbox p{margin:0;color:#b9d0cd;min-height:22px}
-.lbox input{text-align:center;font-size:22px;letter-spacing:6px;background:#ffffff18;color:#fff;border:1px solid #ffffff33}
-.lbox button{padding:12px;border-radius:8px;border:0;background:#4cc2b6;color:#06201f;font-weight:700}
-.lbox .lnk{background:none;color:#b9d0cd;font-weight:400;padding:6px}
-.del.ed{color:var(--main);margin-right:12px}
-dialog.wide{width:min(96vw,640px);max-height:92vh;overflow:auto}
-textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.imp{border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:8px}
-.imp.warn{border-color:var(--down)}
-.imp .ih{display:flex;justify-content:space-between;align-items:center}
-.imp .ck{display:flex;gap:6px;align-items:center;margin:0;color:var(--ink)}
-.imp .ck input{width:auto}
-.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
-.ig input,.ig select{padding:6px;font-size:13px;min-width:0}
-.ig select{grid-column:1/-1}
-button.ok.full{width:100%;padding:12px;margin-top:12px;border-radius:8px;background:var(--main);color:#fff;border:0;font-weight:600}
-button.ok:disabled{opacity:.5}
+.top{display:flex;justify-content:space-between;align-items:baseline}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.log{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px;font-size:13px;color:var(--mute)}
+.empty{color:var(--mute);text-align:center;padding:24px 10px}
+.note{color:var(--mute);font-size:12px;text-align:center;margin:14px 0 30px}
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at 15% 10%,#1d7a73 0,transparent 45%),radial-gradient(circle at 90% 95%,#e0a13a40 0,transparent 40%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%23ffffff' stroke-opacity='.08' stroke-width='2' fill='none'%3E%3Cpath d='M8 98 L34 66 L60 80 L100 28'/%3E%3Cpath d='M20 18v34M72 70v36M92 52v34'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='.07'%3E%3Crect x='14' y='26' width='12' height='16'/%3E%3Crect x='66' y='80' width='12' height='14'/%3E%3Crect x='86' y='60' width='12' height='14'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(160deg,#0a2b2c,#0f3d3e 55%,#0a2224)}
+#login .card{width:min(100%,340px);padding:22px;box-shadow:0 10px 30px #0006}
+#login h1{margin:0 0 4px;font-size:20px}
+label{display:block;font-size:13px;color:var(--mute);margin-top:12px}
+input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.go{width:100%;margin-top:16px;padding:12px;border:0;border-radius:8px;background:var(--main);color:#fff;font:inherit;font-weight:600}
+.go:disabled{opacity:.6}
+#err{color:var(--down);min-height:20px;margin-top:10px;font-size:14px}
 
 :root{--bgimg:linear-gradient(180deg,#d3e8e4 0,#f3f6f5 340px)}
 @media (prefers-color-scheme:dark){:root{--bgimg:linear-gradient(180deg,#123836 0,#0d1819 340px)}}
@@ -85,161 +52,29 @@ header{background:linear-gradient(135deg,var(--nav),#17625c)!important}
 </style>
 </head>
 <body>
-<header>
-  <h1>Catatan Saham</h1>
-  <select id="who"></select>
-  <button id="bLock" aria-label="Kunci">🔒</button>
-  <button id="bImp" aria-label="Impor laporan">📥</button>
-  <button id="bSet" aria-label="Pengaturan">⚙</button>
-</header>
-<main id="app"></main>
-<button class="fab" id="fab">+ Transaksi</button>
-<nav id="nav">
-  <button data-t="ring" class="on">Ringkasan</button>
-  <button data-t="port">Portofolio</button>
-  <button data-t="tx">Transaksi</button>
-  <button data-t="div">Dividen</button>
-</nav>
-<dialog id="dlg"></dialog>
-<div id="msg"></div>
+<div id="login">
+  <div class="card">
+    <h1>Saham Saya</h1>
+    <small>Masuk untuk melihat portofolio Anda</small>
+    <label>Username<input id="u" autocomplete="username" autocapitalize="none"></label>
+    <label>Sandi<input id="p" type="password" autocomplete="current-password"></label>
+    <button class="go" id="btn">Masuk</button>
+    <div id="err"></div>
+  </div>
+</div>
 
-<div id="lock"><div class="lbox">
-  <h2>Catatan Saham</h2>
-  <p id="lmsg"></p>
-  <input id="lpin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="PIN">
-  <input id="lpin2" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Ulangi PIN">
-  <button id="lbtn">Buka</button>
-  <button id="lforgot" class="lnk">Lupa PIN</button>
-</div></div>
+<div id="view" hidden>
+  <header><h1 id="hi"></h1><button id="re">Muat ulang</button><button id="out">Keluar</button></header>
+  <main id="app"></main>
+</div>
 
+<script src="config.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const rp = n => (n < 0 ? '-' : '') + 'Rp' + Math.round(Math.abs(n)).toLocaleString('id-ID');
 const pct = n => (n >= 0 ? '+' : '') + n.toFixed(2).replace('.', ',') + '%';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cls = n => (n >= 0 ? 'up' : 'down');
-const today = () => new Date().toLocaleDateString('sv-SE');
-let cfg = null, D = {tx: [], div: [], own: [], hg: {}}, tab = 'ring', who = 'Semua', started = false;
-try { cfg = JSON.parse(localStorage.getItem('cfg')); } catch (e) {}
-
-function toast(t) { const m = $('#msg'); m.textContent = t; m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 2500); }
-
-// ---------- Kunci aplikasi ----------
-async function sha(s) {
-  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('saham:' + s));
-  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
-}
-function showLock() {
-  const has = !!localStorage.getItem('lockh');
-  $('#lock').style.display = 'flex';
-  $('#lpin2').style.display = has ? 'none' : 'block';
-  $('#lmsg').textContent = has ? 'Masukkan PIN untuk membuka' : 'Buat PIN kunci (4–6 angka)';
-  $('#lbtn').textContent = has ? 'Buka' : 'Simpan PIN';
-  $('#lforgot').style.display = has ? 'block' : 'none';
-  $('#lpin').value = ''; $('#lpin2').value = '';
-  setTimeout(() => $('#lpin').focus(), 50);
-}
-function unlock() {
-  $('#lock').style.display = 'none';
-  if (!started) { started = true; cfg ? load() : setup(); } else load();
-}
-$('#lbtn').onclick = async () => {
-  const p = $('#lpin').value, has = localStorage.getItem('lockh');
-  if (has) {
-    if (await sha(p) === has) unlock();
-    else { $('#lmsg').textContent = 'PIN salah, coba lagi'; $('#lpin').value = ''; }
-  } else {
-    if (!/^\d{4,6}$/.test(p)) { $('#lmsg').textContent = 'PIN harus 4–6 angka'; return; }
-    if (p !== $('#lpin2').value) { $('#lmsg').textContent = 'Kedua PIN tidak sama'; return; }
-    localStorage.setItem('lockh', await sha(p));
-    unlock();
-  }
-};
-$('#lpin').onkeydown = $('#lpin2').onkeydown = e => { if (e.key === 'Enter') $('#lbtn').click(); };
-$('#lforgot').onclick = () => {
-  const s = prompt('Untuk reset PIN kunci, masukkan PIN server (yang ada di Code.gs):');
-  if (s && cfg && s === cfg.pin) { localStorage.removeItem('lockh'); showLock(); }
-  else if (s !== null) toast('PIN server salah');
-};
-$('#bLock').onclick = showLock;
-$('#bImp').onclick = openImport;
-let away = 0;
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) away = Date.now();
-  else if (localStorage.getItem('lockh') && Date.now() - away > 30000) showLock();
-});
-
-// ---------- Data ----------
-async function api(body) {
-  const r = await fetch(cfg.url, {method: 'POST', body: JSON.stringify({...body, token: cfg.pin})});
-  const j = await r.json();
-  if (j.error) throw new Error(j.error);
-  return j;
-}
-async function load() {
-  try {
-    const r = await fetch(cfg.url + '?token=' + encodeURIComponent(cfg.pin));
-    const j = await r.json();
-    if (j.error) throw new Error(j.error);
-    D = j;
-    const s = $('#who');
-    s.innerHTML = ['Semua', ...D.own].map(o => `<option>${esc(o)}</option>`).join('');
-    s.value = D.own.includes(who) ? who : (who = 'Semua');
-    render();
-  } catch (e) {
-    $('#app').innerHTML = `<div class="empty">Gagal memuat: ${esc(e.message)}<br><br><button onclick="setup()">Atur koneksi</button></div>`;
-  }
-}
-function setup() {
-  const url = prompt('Tempel URL Web App dari Apps Script:', cfg?.url || '');
-  if (!url) return;
-  const pin = prompt('PIN server (sama dengan di Code.gs):', cfg?.pin || '');
-  if (!pin) return;
-  cfg = {url: url.trim(), pin: pin.trim()};
-  localStorage.setItem('cfg', JSON.stringify(cfg));
-  load();
-}
-
-// ---------- Perhitungan ----------
-const byDate = (a, b) => a.Tanggal < b.Tanggal ? -1 : a.Tanggal > b.Tanggal ? 1 : a.ID - b.ID;
-
-function holdings(upTo) {
-  const m = {};
-  D.tx.filter(t => !upTo || t.Tanggal <= upTo).sort(byDate).forEach(t => {
-    const h = m[t.Pemilik + '|' + t.Kode] ??= {own: t.Pemilik, kode: t.Kode, sh: 0, cost: 0, real: 0};
-    const n = Number(t.Lembar), p = Number(t.Harga), f = Number(t.Biaya) || 0;
-    if (t.Jenis === 'Beli') { h.sh += n; h.cost += n * p + f; }
-    else {
-      const avg = h.sh ? h.cost / h.sh : 0;
-      h.real += n * p - f - avg * n;
-      h.cost -= avg * n; h.sh -= n;
-    }
-  });
-  return Object.values(m);
-}
-function dividendParts() {
-  return D.div.slice().sort(byDate).map(d => {
-    const hs = holdings(d.Tanggal).filter(h => h.kode === d.Kode && h.sh > 0);
-    const tot = hs.reduce((a, h) => a + h.sh, 0);
-    return {d, parts: tot ? hs.map(h => ({own: h.own, amt: Number(d.Total) * h.sh / tot, sh: h.sh})) : []};
-  });
-}
-function ringkas(owners, H, DP) {
-  const hs = H.filter(h => owners.includes(h.own) && h.sh > 0);
-  const priced = hs.filter(h => D.hg[h.kode]);
-  const modal = hs.reduce((a, h) => a + h.cost, 0);
-  const nilai = priced.reduce((a, h) => a + D.hg[h.kode] * h.sh, 0);
-  const modalP = priced.reduce((a, h) => a + h.cost, 0);
-  const float = nilai - modalP;
-  const real = H.filter(h => owners.includes(h.own)).reduce((a, h) => a + h.real, 0);
-  const dv = DP.reduce((a, x) => a + x.parts.filter(p => owners.includes(p.own)).reduce((b, p) => b + p.amt, 0), 0);
-  return {modal, nilai, float, floatPct: modalP ? float / modalP * 100 : 0, real, dv, total: float + real + dv, tanpaHarga: hs.length - priced.length,
-    items: Object.values(hs.reduce((m, h) => { const x = m[h.kode] ??= {l: h.kode, v: 0}; x.v += D.hg[h.kode] ? D.hg[h.kode] * h.sh : h.cost; return m; }, {}))};
-}
-
-// ---------- Tampilan ----------
-const inWho = o => who === 'Semua' || o === who;
-
 const PAL = ['#0f6b66', '#e0a13a', '#4c78c9', '#c4506b', '#7a5cc2', '#3aa86b', '#d9743a', '#6b8e23', '#2aa5b3', '#a05a3c'];
 function donut(items, title) {
   items = items.filter(i => i.v > 0).sort((a, b) => b.v - a.v);
@@ -254,348 +89,88 @@ function donut(items, title) {
   const leg = items.map((it, k) => `<div class="lg"><i style="background:${PAL[k % PAL.length]}"></i><span>${esc(it.l)}</span><b>${(it.v / tot * 100).toFixed(1).replace('.', ',')}%</b></div>`).join('');
   return `<div class="k" style="margin-top:14px">${title}</div><div class="pie"><svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="${title}"><circle r="48" cx="70" cy="70" fill="none" stroke="var(--line)" stroke-width="24"/>${seg}</svg><div class="legend">${leg}</div></div>`;
 }
+const byDate = (a, b) => a.Tanggal < b.Tanggal ? -1 : a.Tanggal > b.Tanggal ? 1 : a.ID - b.ID;
 
-function kartu(judul, r, extra = '') {
-  return `<div class="card"><h3>${esc(judul)}</h3>
-    <div class="grid">
-      <div><small>Nilai sekarang</small><span class="big">${rp(r.nilai)}</span></div>
-      <div><small>Untung/rugi belum terjual</small><span class="big ${cls(r.float)}">${rp(r.float)}</span><small class="${cls(r.float)}">${pct(r.floatPct)}</small></div>
-      <div><small>Modal tertanam</small>${rp(r.modal)}</div>
-      <div><small>Dividen diterima</small>${rp(r.dv)}</div>
-      <div><small>Laba/rugi sudah terjual</small><span class="${cls(r.real)}">${rp(r.real)}</span></div>
-      <div><small>Total keseluruhan</small><b class="${cls(r.total)}">${rp(r.total)}</b></div>
-    </div>${donut(r.items, 'Komposisi saham')}${extra}${r.tanpaHarga ? `<div class="note">${r.tanpaHarga} saham belum ada harga sekarang, tidak dihitung di nilai.</div>` : ''}</div>`;
+async function call(body) {
+  if (typeof API_URL === 'undefined' || !API_URL.startsWith('http')) throw new Error('Alamat server belum diatur (config.js)');
+  const r = await fetch(API_URL, {method: 'POST', body: JSON.stringify(body)});
+  const j = await r.json();
+  if (j.error) { const e = new Error(j.error); e.habis = j.habis; throw e; }
+  return j;
 }
 
-function render() {
-  const el = $('#app'), H = holdings(), DP = dividendParts();
-  if (tab === 'ring') {
-    const owners = who === 'Semua' ? D.own : [who];
-    let h = '';
-    if (who === 'Semua' && owners.length > 1) { const rg = ringkas(owners, H, DP); h += kartu('Gabungan semua', rg, donut(owners.map(o => { const x = ringkas([o], H, DP); return {l: o, v: x.nilai || x.modal}; }), 'Pembagian per pemilik')); }
-    h += owners.map(o => kartu(o, ringkas([o], H, DP))).join('');
-    el.innerHTML = h || '<div class="empty">Belum ada pemilik.</div>';
-  }
-  if (tab === 'port') {
-    const hs = H.filter(h => h.sh > 0 && inWho(h.own)).sort((a, b) => a.own.localeCompare(b.own) || a.kode.localeCompare(b.kode));
-    el.innerHTML = hs.length ? hs.map(h => {
-      const px = D.hg[h.kode], nilai = px ? px * h.sh : null, pl = px ? nilai - h.cost : null;
-      const log = D.tx.filter(t => t.Pemilik === h.own && t.Kode === h.kode).sort(byDate).reverse()
-        .map(t => `<div>${t.Tanggal} · ${t.Jenis} ${t.Lembar / 100} lot @ ${rp(t.Harga)}</div>`).join('');
-      return `<details class="card hold"><summary>
-        <div class="top"><b>${esc(h.kode)}</b><span>${h.sh / 100} lot · ${esc(h.own)}</span></div>
-        <div class="grid" style="margin-top:6px">
-          <div><small>Harga beli rata-rata</small>${rp(h.cost / h.sh)}</div>
-          <div><small>Harga sekarang</small>${px ? rp(px) : '<span class="down">belum ada</span>'}</div>
-          <div><small>Modal</small>${rp(h.cost)}</div>
-          <div><small>Nilai sekarang</small>${px ? rp(nilai) : '-'}</div>
-        </div>
-        <div style="margin-top:8px"><small class="k">Untung/rugi belum terjual</small>
-          ${px ? `<b class="${cls(pl)}">${rp(pl)} (${pct(pl / h.cost * 100)})</b>` : '-'}</div>
-        </summary><div class="tx">${log}</div></details>`;
-    }).join('') + '<div class="note">Ketuk kartu untuk melihat riwayat beli/jual saham tersebut. Harga dari GOOGLEFINANCE bisa tertunda ±20 menit.</div>'
-      : '<div class="empty">Belum ada saham dipegang.<br>Tekan “+ Transaksi” untuk mulai.</div>';
-  }
-  if (tab === 'tx') {
-    const l = D.tx.filter(t => inWho(t.Pemilik)).sort(byDate).reverse();
-    el.innerHTML = l.length ? `<div class="card">${l.map(t => `<div class="row"><div><b class="${t.Jenis === 'Beli' ? 'up' : 'down'}">${t.Jenis}</b> ${esc(t.Kode)}<br><small>${t.Tanggal} · ${esc(t.Pemilik)}${t.Catatan ? ' · ' + esc(t.Catatan) : ''}</small></div>
-      <div class="r">${t.Lembar / 100} lot @ ${rp(t.Harga)}<br><button class="del ed" onclick="editRec('Transaksi',${t.ID})">Ubah</button><button class="del" onclick="hapus('Transaksi',${t.ID})">Hapus</button></div></div>`).join('')}</div>`
-      : '<div class="empty">Belum ada transaksi.</div>';
-  }
-  if (tab === 'div') {
-    const l = DP.slice().reverse().filter(x => who === 'Semua' || x.parts.some(p => p.own === who) || !x.parts.length);
-    el.innerHTML = l.length ? l.map(x => `<div class="card"><div class="row"><div><b>${esc(x.d.Kode)}</b><br><small>${x.d.Tanggal}${x.d.Catatan ? ' · ' + esc(x.d.Catatan) : ''}</small></div>
-      <div class="r">${rp(x.d.Total)}<br><button class="del ed" onclick="editRec('Dividen',${x.d.ID})">Ubah</button><button class="del" onclick="hapus('Dividen',${x.d.ID})">Hapus</button></div></div>
-      ${x.parts.length ? x.parts.map(p => `<div class="row"><small>${esc(p.own)} (${p.sh / 100} lot)</small><span>${rp(p.amt)}</span></div>`).join('')
-        : '<div class="row"><small class="down">Tidak ada yang memegang saham ini pada tanggal tersebut.</small></div>'}</div>`).join('')
-      : '<div class="empty">Belum ada dividen dicatat.</div>';
-  }
-}
-async function hapus(sheet, id) {
-  if (!confirm('Hapus catatan ini?')) return;
-  try { await api({action: 'delete', sheet, id}); toast('Dihapus'); load(); } catch (e) { toast(e.message); }
-}
+function keluar() { sessionStorage.removeItem('sesi'); $('#view').hidden = true; $('#login').style.display = ''; $('#p').value = ''; }
 
-// ---------- Form ----------
-const dlg = $('#dlg');
-const v = id => $('#' + id).value.trim();
-const NEWOWN = '__new__';
-let editing = null, feeMode = 'pct', IMP = {rows: [], skip: 0};
-dlg.addEventListener('close', () => { editing = null; dlg.classList.remove('wide'); });
-function closeForm() { dlg.close(); }
-
-function ownOpts(sel, blank = 'Pilih pemilik…') {
-  return `<option value="">${blank}</option>` + D.own.map(o => `<option value="${esc(o)}" ${o === sel ? 'selected' : ''}>${esc(o)}</option>`).join('') + `<option value="${NEWOWN}">➕ Tambah pemilik baru…</option>`;
-}
-async function ownChange(el) {
-  if (el.value !== NEWOWN) { el.dataset.prev = el.value; return; }
-  let nama = (prompt('Nama pemilik baru:') || '').trim();
-  if (!nama) { el.value = el.dataset.prev || ''; return; }
-  const ada = D.own.find(o => o.toLowerCase() === nama.toLowerCase());
-  if (ada) nama = ada;
-  else {
-    try { await api({action: 'add', sheet: 'Pemilik', row: {Nama: nama}}); D.own.push(nama); }
-    catch (e) { toast(e.message); el.value = el.dataset.prev || ''; return; }
-  }
-  document.querySelectorAll('dialog select.own').forEach(s => {
-    const cur = s === el ? nama : s.value;
-    s.innerHTML = ownOpts(cur, s.dataset.blank || undefined); s.value = cur;
+function tampil(D) {
+  $('#login').style.display = 'none'; $('#view').hidden = false;
+  $('#hi').textContent = 'Halo, ' + D.owner;
+  const m = {};
+  D.tx.slice().sort(byDate).forEach(t => {
+    const h = m[t.Kode] ??= {kode: t.Kode, sh: 0, cost: 0, real: 0};
+    const n = Number(t.Lembar), p = Number(t.Harga), f = Number(t.Biaya) || 0;
+    if (t.Jenis === 'Beli') { h.sh += n; h.cost += n * p + f; }
+    else { const avg = h.sh ? h.cost / h.sh : 0; h.real += n * p - f - avg * n; h.cost -= avg * n; h.sh -= n; }
   });
-  el.dataset.prev = nama;
-  const w = $('#who'); w.innerHTML = ['Semua', ...D.own].map(o => `<option>${esc(o)}</option>`).join(''); w.value = who;
+  const all = Object.values(m), hs = all.filter(h => h.sh > 0).sort((a, b) => a.kode.localeCompare(b.kode));
+  const priced = hs.filter(h => D.hg[h.kode]);
+  const modal = hs.reduce((a, h) => a + h.cost, 0);
+  const nilai = priced.reduce((a, h) => a + D.hg[h.kode] * h.sh, 0);
+  const modalP = priced.reduce((a, h) => a + h.cost, 0);
+  const fl = nilai - modalP, real = all.reduce((a, h) => a + h.real, 0), dv = D.div.reduce((a, d) => a + d.Jumlah, 0);
+
+  $('#app').innerHTML = `
+  <div class="card"><div class="grid">
+    <div><small>Nilai saham sekarang</small><span class="big">${rp(nilai)}</span></div>
+    <div><small>Untung/rugi belum terjual</small><span class="big ${cls(fl)}">${rp(fl)}</span><small class="${cls(fl)}">${modalP ? pct(fl / modalP * 100) : ''}</small></div>
+    <div><small>Modal tertanam</small>${rp(modal)}</div>
+    <div><small>Dividen diterima</small>${rp(dv)}</div>
+    <div><small>Laba/rugi sudah terjual</small><span class="${cls(real)}">${rp(real)}</span></div>
+    <div><small>Total keseluruhan</small><b class="${cls(fl + real + dv)}">${rp(fl + real + dv)}</b></div>
+  </div>${donut(hs.map(h => ({l: h.kode, v: D.hg[h.kode] ? D.hg[h.kode] * h.sh : h.cost})), 'Komposisi saham')}${hs.length > priced.length ? `<small style="margin-top:8px">${hs.length - priced.length} saham belum ada harga sekarang.</small>` : ''}</div>
+
+  <h2>Saham yang dimiliki</h2>
+  ${hs.length ? hs.map(h => {
+    const px = D.hg[h.kode], val = px ? px * h.sh : null, pl = px ? val - h.cost : null;
+    const log = D.tx.filter(t => t.Kode === h.kode).sort(byDate).reverse().map(t => `<div>${t.Tanggal} · ${t.Jenis} ${t.Lembar / 100} lot @ ${rp(t.Harga)}</div>`).join('');
+    return `<details class="card"><summary><div class="top"><b>${esc(h.kode)}</b><span>${h.sh / 100} lot</span></div>
+      <div class="grid" style="margin-top:6px">
+        <div><small>Harga beli rata-rata</small>${rp(h.cost / h.sh)}</div>
+        <div><small>Harga sekarang</small>${px ? rp(px) : '<span class="down">belum ada</span>'}</div>
+        <div><small>Modal</small>${rp(h.cost)}</div>
+        <div><small>Nilai sekarang</small>${px ? rp(val) : '-'}</div>
+      </div>
+      <div style="margin-top:8px"><small>Untung/rugi</small>${px ? `<b class="${cls(pl)}">${rp(pl)} (${pct(pl / h.cost * 100)})</b>` : '-'}</div></summary>
+      <div class="log">${log}</div></details>`;
+  }).join('') : '<div class="empty">Belum ada saham yang dipegang.</div>'}
+
+  <h2>Dividen</h2>
+  ${D.div.length ? `<div class="card">${D.div.slice().sort(byDate).reverse().map(d => `<div class="row"><div><b>${esc(d.Kode)}</b><small>${d.Tanggal} · ${d.Lembar / 100} lot</small></div><b class="up">${rp(d.Jumlah)}</b></div>`).join('')}</div>`
+    : '<div class="empty">Belum ada dividen.</div>'}
+
+  <h2>Riwayat transaksi</h2>
+  ${D.tx.length ? `<div class="card">${D.tx.slice().sort(byDate).reverse().map(t => `<div class="row"><div><b class="${t.Jenis === 'Beli' ? 'up' : 'down'}">${t.Jenis}</b> ${esc(t.Kode)}<small>${t.Tanggal}</small></div><div class="r">${t.Lembar / 100} lot<small>@ ${rp(t.Harga)}</small></div></div>`).join('')}</div>`
+    : '<div class="empty">Belum ada transaksi.</div>'}
+  <div class="note">Harga dari Google Finance, bisa tertunda ±20 menit. Halaman ini hanya untuk melihat.</div>`;
 }
 
-const nilaiTx = () => (Number(v('f_lot')) || 0) * 100 * (Number(v('f_harga')) || 0);
-function feeFromPct() { $('#f_feerp').value = Math.round(nilaiTx() * (Number(v('f_fee')) || 0) / 100) || ''; }
-function feeFromRp() { const n = nilaiTx(); $('#f_fee').value = n ? Number((Number(v('f_feerp')) / n * 100).toFixed(4)) : ''; }
-function nilaiChanged() { feeMode === 'pct' ? feeFromPct() : feeFromRp(); }
-function jenisChanged() { if (editing) return; $('#f_fee').value = v('f_jenis') === 'Jual' ? 0.25 : 0.15; feeMode = 'pct'; feeFromPct(); }
+async function muat() {
+  try { tampil(await call({action: 'lihat', sesi: sessionStorage.getItem('sesi')})); }
+  catch (e) { if (e.habis) keluar(); else $('#app').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
 
-function editRec(sheet, id) {
-  editing = (sheet === 'Dividen' ? D.div : D.tx).find(x => String(x.ID) === String(id));
-  openForm(sheet);
-}
-function openForm(sheet) {
-  const isDiv = (sheet || (tab === 'div' ? 'Dividen' : 'Transaksi')) === 'Dividen';
-  const e = editing, ttl = e ? 'Ubah' : 'Catat';
-  if (isDiv) {
-    dlg.innerHTML = `<h3>${ttl} dividen</h3>
-    <label>Tanggal<input id="f_tgl" type="date" value="${e ? e.Tanggal : today()}"></label>
-    <label>Kode saham<input id="f_kode" value="${e ? esc(e.Kode) : ''}" placeholder="BBCA" autocapitalize="characters"></label>
-    <label>Total diterima (setelah pajak)<input id="f_tot" type="number" inputmode="decimal" value="${e ? e.Total : ''}"></label>
-    <label>Catatan<input id="f_cat" value="${e ? esc(e.Catatan) : ''}"></label>
-    <div class="btns"><button onclick="closeForm()">Batal</button><button class="ok" onclick="simpanDiv()">Simpan</button></div>`;
-  } else {
-    const nil = e ? e.Lembar * e.Harga : 0;
-    feeMode = e ? 'rp' : 'pct';
-    dlg.innerHTML = `<h3>${ttl} transaksi</h3>
-    <label>Jenis<select id="f_jenis" onchange="jenisChanged()"><option ${e && e.Jenis === 'Beli' ? 'selected' : ''}>Beli</option><option ${e && e.Jenis === 'Jual' ? 'selected' : ''}>Jual</option></select></label>
-    <label>Tanggal<input id="f_tgl" type="date" value="${e ? e.Tanggal : today()}"></label>
-    <label>Pemilik<select id="f_own" class="own" onchange="ownChange(this)">${ownOpts(e ? e.Pemilik : (who !== 'Semua' ? who : ''))}</select></label>
-    <label>Kode saham<input id="f_kode" value="${e ? esc(e.Kode) : ''}" placeholder="BBCA" autocapitalize="characters"></label>
-    <div class="two"><label>Jumlah (lot)<input id="f_lot" type="number" inputmode="numeric" value="${e ? e.Lembar / 100 : ''}" oninput="nilaiChanged()"></label>
-    <label>Harga per lembar<input id="f_harga" type="number" inputmode="decimal" value="${e ? e.Harga : ''}" oninput="nilaiChanged()"></label></div>
-    <div class="two"><label>Fee + pajak (%)<input id="f_fee" type="number" step="0.0001" inputmode="decimal" value="${e ? (nil ? Number((e.Biaya / nil * 100).toFixed(4)) : 0) : 0.15}" oninput="feeMode='pct';feeFromPct()"></label>
-    <label>Fee (Rp)<input id="f_feerp" type="number" inputmode="decimal" value="${e ? e.Biaya : ''}" oninput="feeMode='rp';feeFromRp()"></label></div>
-    <label>Catatan<input id="f_cat" value="${e ? esc(e.Catatan) : ''}"></label>
-    <div class="btns"><button onclick="closeForm()">Batal</button><button class="ok" onclick="simpanTx()">Simpan</button></div>`;
-  }
-  dlg.showModal();
-}
-async function simpan(sheet, row) {
+async function masuk() {
+  const b = $('#btn'); b.disabled = true; $('#err').textContent = '';
   try {
-    if (editing) await api({action: 'update', sheet, id: editing.ID, row});
-    else await api({action: 'add', sheet, row});
-    closeForm(); toast('Tersimpan'); load();
-  } catch (e) { toast(e.message); }
+    const j = await call({action: 'login', username: $('#u').value, sandi: $('#p').value});
+    sessionStorage.setItem('sesi', j.sesi); tampil(j);
+  } catch (e) { $('#err').textContent = e.message; }
+  b.disabled = false;
 }
-function simpanTx() {
-  const kode = v('f_kode').toUpperCase(), lot = Number(v('f_lot')), harga = Number(v('f_harga')), own = v('f_own'), jenis = v('f_jenis'), lembar = lot * 100;
-  if (!own) return toast('Pilih pemilik dulu');
-  if (!kode || !lot || !harga) return toast('Lengkapi kode, lot, dan harga');
-  if (jenis === 'Jual') {
-    const asli = D.tx; D.tx = asli.filter(t => !editing || t.ID !== editing.ID);
-    const h = holdings().find(x => x.own === own && x.kode === kode); D.tx = asli;
-    if (!h || h.sh < lembar) return toast(`${own} hanya punya ${h ? h.sh / 100 : 0} lot ${kode}`);
-  }
-  simpan('Transaksi', {Tanggal: v('f_tgl'), Jenis: jenis, Pemilik: own, Kode: kode, Lembar: lembar, Harga: harga, Biaya: Number(v('f_feerp')) || 0, Catatan: v('f_cat')});
-}
-function simpanDiv() {
-  const kode = v('f_kode').toUpperCase(), tot = Number(v('f_tot'));
-  if (!kode || !tot) return toast('Lengkapi kode dan total');
-  simpan('Dividen', {Tanggal: v('f_tgl'), Kode: kode, Total: tot, Catatan: v('f_cat')});
-}
-
-// ---------- Impor laporan broker ----------
-const BLN = {jan: 0, feb: 1, mar: 2, apr: 3, may: 4, mei: 4, jun: 5, jul: 6, aug: 7, agu: 7, sep: 8, oct: 9, okt: 9, nov: 10, dec: 11, des: 11};
-
-function parseLaporan(text) {
-  text = text.replace(/[|•·_]+/g, ' ');
-  const re = /(Buy|Sell|Beli|Jual|DIV|Dividen|IPO|Refund|Deposit|Withdraw)\s+(?:([A-Za-z][A-Za-z0-9]{2,5})\s+)?(\d[\d.,]*)\s+(\d[\d.,]*|[-—–])\s+(\d[\d.,]*|[-—–])\s+(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})/gi;
-  const n = s => /^\d/.test(s) ? Number(s.replace(/[.,]/g, '')) : 0;
-  const rows = []; let skip = 0, m;
-  while ((m = re.exec(text))) {
-    const a = m[1].toLowerCase(), kode = (m[2] || '').toUpperCase(), mo = BLN[m[7].slice(0, 3).toLowerCase()];
-    if (mo === undefined) continue;
-    const tgl = `${m[8]}-${String(mo + 1).padStart(2, '0')}-${m[6].padStart(2, '0')}`;
-    const net = n(m[3]), qty = n(m[4]), px = n(m[5]);
-    if (['deposit', 'refund', 'withdraw'].includes(a)) { skip++; continue; }
-    if (!kode) continue;
-    if (a === 'div' || a === 'dividen') { rows.push({jenis: 'Dividen', tgl, kode, tot: net, note: 'Impor broker', ok: true}); continue; }
-    if (!qty || !px) continue;
-    const gross = qty * 100 * px, jual = a === 'sell' || a === 'jual', fee = jual ? gross - net : net - gross;
-    rows.push({jenis: jual ? 'Jual' : 'Beli', tgl, kode, lot: qty, harga: px, fee: Math.max(0, fee), own: '', note: a === 'ipo' ? 'IPO' : 'Impor broker', ok: true, warn: fee < 0 || fee > gross * 0.01});
-  }
-  if (rows.length > 1 && rows[0].tgl >= rows[rows.length - 1].tgl) rows.reverse();
-  rows.sort((a, b) => a.tgl < b.tgl ? -1 : a.tgl > b.tgl ? 1 : 0);
-  rows.forEach(r => {
-    r.dup = r.jenis === 'Dividen'
-      ? D.div.some(d => d.Tanggal === r.tgl && d.Kode === r.kode && Number(d.Total) === r.tot)
-      : D.tx.some(t => t.Tanggal === r.tgl && t.Jenis === r.jenis && t.Kode === r.kode && Number(t.Lembar) === r.lot * 100 && Number(t.Harga) === r.harga);
-    if (r.dup) r.ok = false;
-  });
-  return {rows, skip};
-}
-
-function prepImg(file) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    img.onload = () => {
-      const sc = img.width < 1400 ? 2 : 1, c = document.createElement('canvas');
-      c.width = img.width * sc; c.height = img.height * sc;
-      const g = c.getContext('2d'); g.drawImage(img, 0, 0, c.width, c.height);
-      const d = g.getImageData(0, 0, c.width, c.height), p = d.data, L = new Float32Array(c.width * c.height);
-      let sum = 0;
-      for (let i = 0, j = 0; i < p.length; i += 4, j++) { L[j] = .299 * p[i] + .587 * p[i + 1] + .114 * p[i + 2]; sum += L[j]; }
-      const mean = sum / L.length, dark = mean < 128;
-      for (let i = 0, j = 0; i < p.length; i += 4, j++) {
-        const ink = dark ? L[j] > mean + 35 : L[j] < mean - 35;
-        p[i] = p[i + 1] = p[i + 2] = ink ? 0 : 255; p[i + 3] = 255;
-      }
-      g.putImageData(d, 0, 0); URL.revokeObjectURL(img.src); res(c.toDataURL('image/png'));
-    };
-    img.onerror = () => rej(new Error('Gambar tidak bisa dibuka'));
-    img.src = URL.createObjectURL(file);
-  });
-}
-function loadScript(src) {
-  return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Gagal memuat OCR, cek internet')); document.head.appendChild(s); });
-}
-async function ocrImage(file) {
-  if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-  const img = await prepImg(file);
-  const w = await Tesseract.createWorker('eng', 1, {logger: m => { if (m.status === 'recognizing text') $('#imp_st').textContent = 'Membaca gambar… ' + Math.round(m.progress * 100) + '%'; }});
-  await w.setParameters({tessedit_pageseg_mode: '6', preserve_interword_spaces: '1'});
-  const {data} = await w.recognize(img); await w.terminate();
-  return data.text;
-}
-
-function openImport() {
-  editing = null; dlg.classList.add('wide');
-  dlg.innerHTML = `<h3>Impor laporan broker</h3>
-    <div class="note">Unggah tangkapan layar riwayat transaksi atau tempel teksnya. Buy/Sell/IPO jadi transaksi, DIV jadi dividen, Deposit dan Refund diabaikan. Hasil bisa dicek dan diubah dulu sebelum disimpan.</div>
-    <label>Screenshot laporan<input id="imp_file" type="file" accept="image/*"></label>
-    <label>…atau tempel teks<textarea id="imp_txt" rows="4" placeholder="Buy MBMA 153,230 3 510 15 Sep 2026"></textarea></label>
-    <div id="imp_st" class="note"></div><div id="imp_out"></div>
-    <div class="btns"><button onclick="closeForm()">Tutup</button><button class="ok" id="imp_go" onclick="impRead()">Baca laporan</button></div>`;
-  dlg.showModal();
-}
-async function impRead() {
-  const st = $('#imp_st'), go = $('#imp_go'); go.disabled = true; st.style.color = '';
-  try {
-    let text = $('#imp_txt').value; const f = $('#imp_file').files[0];
-    if (f) { st.textContent = 'Menyiapkan OCR (pertama kali agak lama)…'; text = (await ocrImage(f)) + '\n' + text; }
-    if (!text.trim()) throw new Error('Pilih gambar atau tempel teks dulu');
-    IMP = parseLaporan(text); st.textContent = '';
-    if (!IMP.rows.length) throw new Error('Tidak ada baris transaksi terbaca. Coba gambar lebih tajam atau tempel teksnya.');
-    impRender();
-  } catch (e) { st.textContent = e.message; st.style.color = 'var(--down)'; }
-  go.disabled = false;
-}
-function impRender() {
-  $('#imp_out').innerHTML = `<div class="note">${IMP.rows.length} baris terbaca${IMP.skip ? `, ${IMP.skip} baris Deposit/Refund diabaikan` : ''}. Baris yang sudah ada di data tidak dicentang.</div>
-    <label>Pemilik untuk semua transaksi beli/jual<select id="imp_own" class="own" onchange="ownChange(this)">${ownOpts(who !== 'Semua' ? who : '')}</select></label>
-    ${IMP.rows.map(impRow).join('')}<div id="imp_sum"></div>
-    <button class="ok full" id="imp_save" onclick="impSave()">Simpan</button>`;
-  impSum();
-}
-function impRow(r, i) {
-  const dv = r.jenis === 'Dividen';
-  return `<div class="imp ${r.warn ? 'warn' : ''}"><div class="ih"><label class="ck"><input type="checkbox" ${r.ok ? 'checked' : ''} onchange="impSet(${i},'ok',this.checked)"> <b class="${r.jenis === 'Beli' ? 'up' : r.jenis === 'Jual' ? 'down' : ''}">${r.jenis}</b></label>
-    <small class="down">${r.dup ? 'sudah ada' : ''}${r.warn ? ' cek fee' : ''}</small></div>
-    <div class="ig"><input type="date" value="${r.tgl}" onchange="impSet(${i},'tgl',this.value)">
-    <input value="${esc(r.kode)}" oninput="impSet(${i},'kode',this.value.toUpperCase())">
-    ${dv ? `<input type="number" value="${r.tot}" placeholder="Total" oninput="impSet(${i},'tot',+this.value)">`
-      : `<input type="number" value="${r.lot}" placeholder="Lot" oninput="impSet(${i},'lot',+this.value)">
-    <input type="number" value="${r.harga}" placeholder="Harga" oninput="impSet(${i},'harga',+this.value)">
-    <input type="number" value="${r.fee}" placeholder="Fee Rp" oninput="impSet(${i},'fee',+this.value)">
-    <select class="own" data-blank="Ikut pilihan atas" onchange="ownChange(this).then(()=>impSet(${i},'own',this.value))">${ownOpts(r.own, 'Ikut pilihan atas')}</select>`}
-    </div></div>`;
-}
-function impSet(i, k, val) { IMP.rows[i][k] = val; impSum(); }
-function impSum() {
-  const rows = IMP.rows.filter(r => r.ok), by = {};
-  rows.forEach(r => {
-    const o = by[r.kode] ??= {lot: 0, beli: 0, jual: 0, dv: 0};
-    if (r.jenis === 'Dividen') o.dv += r.tot;
-    else { const n = r.lot * 100 * r.harga; if (r.jenis === 'Beli') { o.lot += r.lot; o.beli += n + r.fee; } else { o.lot -= r.lot; o.jual += n - r.fee; } }
-  });
-  const ks = Object.keys(by).sort();
-  $('#imp_sum').innerHTML = ks.length ? '<div class="k" style="margin-top:10px">Akumulasi per saham (baris tercentang)</div>' + ks.map(k => `<div class="row"><b>${esc(k)}</b><small class="r">${by[k].lot} lot bersih · beli ${rp(by[k].beli)} · jual ${rp(by[k].jual)}${by[k].dv ? ' · dividen ' + rp(by[k].dv) : ''}</small></div>`).join('') : '';
-  $('#imp_save').textContent = `Simpan ${rows.length} baris`; $('#imp_save').disabled = !rows.length;
-}
-async function impSave() {
-  const g = v('imp_own'), tx = [], dv = [];
-  for (const r of IMP.rows.filter(r => r.ok)) {
-    if (!r.kode || !r.tgl) return toast('Ada baris tanpa kode/tanggal');
-    if (r.jenis === 'Dividen') { if (!r.tot) return toast('Total dividen ' + r.kode + ' kosong'); dv.push({Tanggal: r.tgl, Kode: r.kode, Total: r.tot, Catatan: r.note}); continue; }
-    const own = r.own || g;
-    if (!own) return toast('Pilih pemilik (di atas atau per baris)');
-    if (!r.lot || !r.harga) return toast('Lot/harga ' + r.kode + ' kosong');
-    tx.push({Tanggal: r.tgl, Jenis: r.jenis, Pemilik: own, Kode: r.kode, Lembar: r.lot * 100, Harga: r.harga, Biaya: r.fee || 0, Catatan: r.note});
-  }
-  $('#imp_save').disabled = true;
-  try {
-    if (tx.length) await api({action: 'addMany', sheet: 'Transaksi', rows: tx});
-    if (dv.length) await api({action: 'addMany', sheet: 'Dividen', rows: dv});
-    closeForm(); toast(`${tx.length} transaksi & ${dv.length} dividen tersimpan`); load();
-  } catch (e) { toast(e.message); $('#imp_save').disabled = false; }
-}
-
-// ---------- Pengaturan & event ----------
-$('#bSet').onclick = () => {
-  dlg.innerHTML = `<h3>Pengaturan</h3><div class="menu">
-    <button onclick="dlg.close();load();toast('Memuat ulang…')">Muat ulang data & harga</button>
-    <button onclick="dlg.close();localStorage.removeItem('lockh');showLock()">Ganti PIN kunci</button>
-    <button onclick="kelolaAkun()">Kelola akun pemantau (adik)</button>
-    <button onclick="dlg.close();setup()">Atur koneksi Google Sheet</button>
-    <button onclick="dlg.close()">Tutup</button></div>`;
-  dlg.showModal();
-};
-let AK = [];
-async function kelolaAkun() {
-  dlg.classList.add('wide');
-  dlg.innerHTML = `<h3>Akun pemantau</h3><div id="ak" class="note">Memuat…</div>
-    <div class="note">Ketuk tulisan di kanan untuk melihat sandi. Sandi tersimpan terbaca di sheet "Akun", jadi pakai sandi khusus aplikasi ini.</div>
-    <div class="btns"><button onclick="closeForm()">Tutup</button><button class="ok" onclick="buatAkun()">+ Akun baru</button></div>`;
-  if (!dlg.open) dlg.showModal();
-  try {
-    AK = (await api({action: 'daftarAkun'})).akun;
-    $('#ak').className = '';
-    $('#ak').innerHTML = AK.length ? AK.map((a, i) => `<div class="row"><div><b>${esc(a.username)}</b><small>${esc(a.pemilik)}</small></div><div class="r"><span class="pw" onclick="this.textContent=AK[${i}].sandi||'(belum tersimpan, ubah sandi)'">ketuk untuk lihat</span><br><button class="del ed" onclick="buatAkun(AK[${i}].username,AK[${i}].pemilik)">Ubah sandi</button><button class="del" onclick="hapusAkun(${i})">Hapus</button></div></div>`).join('') : '<div class="empty">Belum ada akun.</div>';
-  } catch (e) { $('#ak').textContent = e.message; }
-}
-async function buatAkun(u0, o0) {
-  let owner = o0;
-  if (!owner) {
-    owner = (prompt('Akun untuk pemilik siapa? Ketik persis salah satu: ' + D.own.join(', ')) || '').trim();
-    if (!D.own.includes(owner)) return toast('Nama pemilik tidak ada');
-  }
-  const username = u0 || prompt('Username untuk ' + owner + ' (huruf kecil, tanpa spasi):'); if (!username) return;
-  const sandi = prompt('Sandi untuk ' + username + ' (minimal 6 karakter):'); if (!sandi) return;
-  try { await api({action: 'akun', username, sandi, pemilik: owner}); toast('Akun tersimpan'); kelolaAkun(); } catch (e) { toast(e.message); }
-}
-async function hapusAkun(i) {
-  if (!confirm('Hapus akun ' + AK[i].username + '? Akses dicabut.')) return;
-  try { await api({action: 'hapusAkun', username: AK[i].username}); kelolaAkun(); } catch (e) { toast(e.message); }
-}
-function fab() {
-  const f = $('#fab');
-  f.style.display = tab === 'ring' ? 'none' : 'block';
-  f.textContent = tab === 'div' ? '+ Dividen' : '+ Transaksi';
-}
-$('#nav').onclick = e => {
-  const t = e.target.dataset.t; if (!t) return;
-  tab = t;
-  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
-  fab(); render();
-};
-$('#who').onchange = e => { who = e.target.value; render(); };
-$('#fab').onclick = () => { if (tab === 'port') tab = 'tx'; openForm(); };
-fab();
-
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-showLock();
+$('#btn').onclick = masuk;
+$('#p').onkeydown = e => { if (e.key === 'Enter') masuk(); };
+$('#re').onclick = muat;
+$('#out').onclick = keluar;
+if (sessionStorage.getItem('sesi')) muat();
 </script>
 </body>
 </html>
