@@ -75,6 +75,11 @@ dialog[open]{animation:in .2s ease both}
 @keyframes sh{to{background-position:-200% 0}}
 .ghost{width:100%;margin-top:10px;padding:11px;border-radius:8px;background:transparent;border:1px solid #ffffff44;color:#fff;font:inherit;cursor:pointer}
 .lbox button,.go{box-shadow:0 8px 18px -8px #4cc2b6}
+
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;padding:9px;border-radius:9px;font:inherit;color:var(--mute);cursor:pointer}
+.seg .on{background:var(--main);color:#fff;font-weight:600}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--mute)}
 </style>
 </head>
 <body>
@@ -122,6 +127,75 @@ function daftarAvg(l) {
   return `<div class="k" style="margin-top:14px">Saham dipegang · avg (rata-rata harga beli)</div>` + l.map(x => `<div class="row"><b>${esc(x.kode)}</b><small class="r">${x.sh / 100} lot · avg ${rp(x.cost / x.sh)}</small></div>`).join('');
 }
 let tampilTutup = false, LD = null;
+
+let kt = 'trade';
+const fmtTgl = t => new Date(t).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: '2-digit'});
+function gauge(wr, n) {
+  const L = Math.PI * 50, g = wr / 100 * L;
+  return `<svg viewBox="0 0 120 70" width="150" role="img" aria-label="Win rate"><path d="M10,60A50,50 0 0 1 110,60" fill="none" stroke="${n ? 'var(--down)' : 'var(--line)'}" stroke-width="10" stroke-linecap="round"/><path d="M10,60A50,50 0 0 1 110,60" fill="none" stroke="var(--up)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${g} ${L}"/><text x="60" y="46" text-anchor="middle" font-size="17" font-weight="700" fill="currentColor">${n}</text><text x="60" y="62" text-anchor="middle" font-size="8" fill="var(--mute)">Trades</text></svg>`;
+}
+function stepChart(pts, label) {
+  if (!pts.length) return '<div class="empty">Belum ada data untuk grafik</div>';
+  const W = 320, H = 130, P = 6, t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, Date.now());
+  const lo = Math.min(...pts.map(p => p.v), 0), hi = Math.max(...pts.map(p => p.v), 1);
+  const X = t => P + (t - t0) / Math.max(1, t1 - t0) * (W - 2 * P), Y = v => H - P - (v - lo) / Math.max(1, hi - lo) * (H - 2 * P);
+  let d = `M${X(t0)},${Y(pts[0].v)}`;
+  pts.slice(1).forEach(p => { d += `H${X(p.t)}V${Y(p.v)}`; });
+  d += `H${X(t1)}`;
+  const c = pts[pts.length - 1].v >= 0 ? 'var(--up)' : 'var(--down)';
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${label}"><path d="${d}V${H - P}H${X(t0)}Z" fill="${c}" opacity=".13"/><path d="${d}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg><div class="axis"><span>${fmtTgl(t0)}</span><span>${fmtTgl(t1)}</span></div>`;
+}
+function kinerja(tx, divs, now, kt, again) {
+  const m = {}, T = [], kurva = [], real = [];
+  let modal = 0, cum = 0;
+  tx.slice().sort(byDate).forEach(t => {
+    const h = m[t.Pemilik + '|' + t.Kode] ??= {sh: 0, cost: 0};
+    const n = Number(t.Lembar), p = Number(t.Harga), f = Number(t.Biaya) || 0, tm = Date.parse(t.Tanggal);
+    if (t.Jenis === 'Beli') { h.sh += n; h.cost += n * p + f; modal += n * p + f; }
+    else {
+      const avg = h.sh ? h.cost / h.sh : 0, basis = avg * n, pl = n * p - f - basis;
+      h.cost -= basis; h.sh -= n; modal -= basis;
+      T.push({tm, kode: t.Kode, pl, basis, pct: basis ? pl / basis * 100 : 0}); cum += pl; real.push({t: tm, v: cum});
+    }
+    kurva.push({t: tm, v: modal});
+  });
+  const sum = a => a.reduce((x, y) => x + y, 0);
+  const W = T.filter(x => x.pl > 0), L = T.filter(x => x.pl < 0), gp = sum(W.map(x => x.pl)), gl = -sum(L.map(x => x.pl));
+  const dv = sum(divs.map(d => d.Jumlah)), seg = `<div class="seg"><button class="${kt === 'port' ? 'on' : ''}" onclick="kt='port';${again}">Portofolio</button><button class="${kt === 'trade' ? 'on' : ''}" onclick="kt='trade';${again}">Trade</button></div>`;
+
+  if (kt === 'port') {
+    const bulan = {};
+    const key = tm => new Date(tm).toISOString().slice(0, 7);
+    T.forEach(x => { (bulan[key(x.tm)] ??= {pl: 0, dv: 0}).pl += x.pl; });
+    divs.forEach(d => { (bulan[key(Date.parse(d.Tanggal))] ??= {pl: 0, dv: 0}).dv += d.Jumlah; });
+    const ks = Object.keys(bulan).sort().reverse().slice(0, 12);
+    const modalAkhir = k => { const e = Date.parse(k + '-01'), e2 = new Date(new Date(e).setMonth(new Date(e).getMonth() + 1)).getTime(); let v = 0; kurva.forEach(p => { if (p.t < e2) v = p.v; }); return v; };
+    return seg + `<div class="card"><small>Nilai portofolio sekarang</small><span class="big">${rp(now.nilai)}</span>
+      <div class="grid" style="margin-top:8px"><div><small>Modal tertanam</small>${rp(now.modal)}</div><div><small>Selisih nilai vs modal</small><b class="${cls(now.nilai - now.modal)}">${rp(now.nilai - now.modal)}</b></div></div>
+      <div class="k" style="margin-top:14px">Modal tertanam dari waktu ke waktu</div>${stepChart(kurva, 'Modal tertanam')}</div>
+      <div class="card"><div class="k">Hasil per bulan (sudah terjual + dividen)</div>${ks.length ? ks.map(k => { const b = bulan[k], t = b.pl + b.dv; return `<div class="row"><div><b>${k}</b><small>Modal akhir ${rp(modalAkhir(k))}</small></div><div class="r"><b class="${cls(t)}">${rp(t)}</b><small>jual ${rp(b.pl)} · dividen ${rp(b.dv)}</small></div></div>`; }).join('') : '<div class="empty">Belum ada hasil.</div>'}</div>`;
+  }
+
+  const wr = T.length ? W.length / T.length * 100 : 0, pf = gl ? gp / gl : 0;
+  const mp = W.length ? W.reduce((a, b) => b.pl > a.pl ? b : a) : null, ml = L.length ? L.reduce((a, b) => b.pl < a.pl ? b : a) : null;
+  const byK = {};
+  T.forEach(x => { const o = byK[x.kode] ??= {kode: x.kode, n: 0, pl: 0, basis: 0}; o.n++; o.pl += x.pl; o.basis += x.basis; });
+  const top = Object.values(byK).sort((a, b) => b.pl - a.pl);
+  return seg + `<div class="card"><div class="top"><div><small>Win rate</small><span class="big ${cls(wr - 50)}">${wr.toFixed(2).replace('.', ',')}%</span>
+      <small style="margin-top:10px">Profit factor</small><span class="big">${gl ? pf.toFixed(2).replace('.', ',') : (gp ? '∞' : '-')}</span></div>
+      <div style="text-align:center">${gauge(wr, T.length)}<div class="grid"><div><b class="up">${W.length}</b><small>Menang</small></div><div><b class="down">${L.length}</b><small>Kalah</small></div></div></div></div></div>
+    <div class="grid"><div class="card"><small>Total nilai transaksi</small><b>${rp(sum(tx.map(t => t.Lembar * t.Harga)))}</b></div><div class="card"><small>Total order</small><b>${tx.length}</b></div>
+      <div class="card"><small>Profit terbesar</small><b class="up">${mp ? rp(mp.pl) : '-'}</b><small>${mp ? pct(mp.pct) + ' · ' + esc(mp.kode) : ''}</small></div>
+      <div class="card"><small>Rugi terbesar</small><b class="down">${ml ? rp(ml.pl) : '-'}</b><small>${ml ? pct(ml.pct) + ' · ' + esc(ml.kode) : ''}</small></div>
+      <div class="card"><small>Rata-rata profit</small><b class="up">${W.length ? rp(gp / W.length) : '-'}</b></div>
+      <div class="card"><small>Rata-rata rugi</small><b class="down">${L.length ? rp(-gl / L.length) : '-'}</b></div></div>
+    <div class="card"><small>Total laba terealisasi (saham + dividen)</small><span class="big ${cls(cum + dv)}">${rp(cum + dv)}</span>
+      ${stepChart(real, 'Laba terealisasi')}
+      <div class="row"><span>Laba saham terjual</span><b class="${cls(cum)}">${rp(cum)}</b></div>
+      <div class="row"><small>Realized gain</small><span class="up">${rp(gp)}</span></div><div class="row"><small>Realized loss</small><span class="down">${rp(-gl)}</span></div>
+      <div class="row"><span>Total dividen diterima</span><b class="up">${rp(dv)}</b></div></div>
+    <div class="card"><div class="k">Top gainer</div>${top.length ? top.map(x => `<div class="row"><div><b>${esc(x.kode)}</b><small>${x.n} trade</small></div><b class="${cls(x.pl)}">${rp(x.pl)} (${pct(x.basis ? x.pl / x.basis * 100 : 0)})</b></div>`).join('') : '<div class="empty">Belum ada saham yang dijual.</div>'}</div>`;
+}
 const byDate = (a, b) => a.Tanggal < b.Tanggal ? -1 : a.Tanggal > b.Tanggal ? 1 : a.ID - b.ID;
 
 async function call(body) {
@@ -163,6 +237,9 @@ function tampil(D) {
     <div><small>Laba/rugi sudah terjual</small><span class="${cls(real)}">${rp(real)}</span></div>
     <div><small>Total keseluruhan</small><b class="${cls(fl + real + dv)}">${rp(fl + real + dv)}</b></div>
   </div>${donut(hs.map(h => ({l: h.kode, v: D.hg[h.kode] ? D.hg[h.kode] * h.sh : h.cost})), 'Komposisi saham')}${daftarAvg(hs)}${hs.length > priced.length ? `<small style="margin-top:8px">${hs.length - priced.length} saham belum ada harga sekarang.</small>` : ''}</div>
+
+  <h2>Kinerja</h2>
+  ${kinerja(D.tx, D.div, {nilai: nilai + modal - modalP, modal}, kt, 'tampil(LD)')}
 
   <h2>Saham yang dimiliki</h2>
   ${hs.length ? hs.map(h => {
