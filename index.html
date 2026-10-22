@@ -128,6 +128,8 @@ function daftarAvg(l) {
 }
 let tampilTutup = false, LD = null;
 
+const isPindah = t => String(t.Catatan || '').startsWith('Pindah');
+const lbl = t => isPindah(t) ? (t.Jenis === 'Jual' ? 'Pindah keluar' : 'Pindah masuk') : t.Jenis;
 let kt = 'trade';
 const fmtTgl = t => new Date(t).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: '2-digit'});
 function gauge(wr, n) {
@@ -155,7 +157,7 @@ function kinerja(tx, divs, now, kt, again) {
     else {
       const avg = h.sh ? h.cost / h.sh : 0, basis = avg * n, pl = n * p - f - basis;
       h.cost -= basis; h.sh -= n; modal -= basis;
-      T.push({tm, kode: t.Kode, pl, basis, pct: basis ? pl / basis * 100 : 0}); cum += pl; real.push({t: tm, v: cum});
+      if (!isPindah(t)) { T.push({tm, kode: t.Kode, pl, basis, pct: basis ? pl / basis * 100 : 0}); cum += pl; real.push({t: tm, v: cum}); }
     }
     kurva.push({t: tm, v: modal});
   });
@@ -184,7 +186,7 @@ function kinerja(tx, divs, now, kt, again) {
   return seg + `<div class="card"><div class="top"><div><small>Win rate</small><span class="big ${cls(wr - 50)}">${wr.toFixed(2).replace('.', ',')}%</span>
       <small style="margin-top:10px">Profit factor</small><span class="big">${gl ? pf.toFixed(2).replace('.', ',') : (gp ? '∞' : '-')}</span></div>
       <div style="text-align:center">${gauge(wr, T.length)}<div class="grid"><div><b class="up">${W.length}</b><small>Menang</small></div><div><b class="down">${L.length}</b><small>Kalah</small></div></div></div></div></div>
-    <div class="grid"><div class="card"><small>Total nilai transaksi</small><b>${rp(sum(tx.map(t => t.Lembar * t.Harga)))}</b></div><div class="card"><small>Total order</small><b>${tx.length}</b></div>
+    <div class="grid"><div class="card"><small>Total nilai transaksi</small><b>${rp(sum(tx.filter(t => !isPindah(t)).map(t => t.Lembar * t.Harga)))}</b></div><div class="card"><small>Total order</small><b>${tx.filter(t => !isPindah(t)).length}</b></div>
       <div class="card"><small>Profit terbesar</small><b class="up">${mp ? rp(mp.pl) : '-'}</b><small>${mp ? pct(mp.pct) + ' · ' + esc(mp.kode) : ''}</small></div>
       <div class="card"><small>Rugi terbesar</small><b class="down">${ml ? rp(ml.pl) : '-'}</b><small>${ml ? pct(ml.pct) + ' · ' + esc(ml.kode) : ''}</small></div>
       <div class="card"><small>Rata-rata profit</small><b class="up">${W.length ? rp(gp / W.length) : '-'}</b></div>
@@ -226,6 +228,7 @@ function tampil(D) {
   const modalP = priced.reduce((a, h) => a + h.cost, 0);
   const fl = nilai - modalP, real = all.reduce((a, h) => a + h.real, 0), dv = D.div.reduce((a, d) => a + d.Jumlah, 0);
 
+  const jl = D.tx.filter(t => t.Jenis === 'Jual' && !isPindah(t)).reduce((a, t) => a + t.Lembar * t.Harga - (Number(t.Biaya) || 0), 0);
   const buka = new Set(hs.map(h => h.kode));
   const txV = D.tx.filter(t => tampilTutup || buka.has(t.Kode)), dvV = D.div.filter(d => tampilTutup || buka.has(d.Kode));
   $('#app').innerHTML = `
@@ -236,6 +239,8 @@ function tampil(D) {
     <div><small>Dividen diterima</small>${rp(dv)}</div>
     <div><small>Laba/rugi sudah terjual</small><span class="${cls(real)}">${rp(real)}</span></div>
     <div><small>Total keseluruhan</small><b class="${cls(fl + real + dv)}">${rp(fl + real + dv)}</b></div>
+    <div><small>Uang hasil jual</small>${rp(jl)}</div>
+    <div><small>Total uang masuk (jual + dividen)</small><b class="up">${rp(jl + dv)}</b></div>
   </div>${donut(hs.map(h => ({l: h.kode, v: D.hg[h.kode] ? D.hg[h.kode] * h.sh : h.cost})), 'Komposisi saham')}${daftarAvg(hs)}${hs.length > priced.length ? `<small style="margin-top:8px">${hs.length - priced.length} saham belum ada harga sekarang.</small>` : ''}</div>
 
   <h2>Kinerja</h2>
@@ -262,7 +267,7 @@ function tampil(D) {
     : '<div class="empty">Belum ada dividen.</div>'}
 
   <h2>Riwayat transaksi</h2>
-  ${txV.length ? `<div class="card">${txV.slice().sort(byDate).reverse().map(t => `<div class="row"><div><b class="${t.Jenis === 'Beli' ? 'up' : 'down'}">${t.Jenis}</b> ${esc(t.Kode)}<small>${t.Tanggal}</small></div><div class="r">${t.Lembar / 100} lot<small>@ ${rp(t.Harga)}</small></div></div>`).join('')}</div>`
+  ${txV.length ? `<div class="card">${txV.slice().sort(byDate).reverse().map(t => `<div class="row"><div><b class="${t.Jenis === 'Beli' ? 'up' : 'down'}">${lbl(t)}</b> ${esc(t.Kode)}<small>${t.Tanggal}</small></div><div class="r">${t.Lembar / 100} lot<small>@ ${rp(t.Harga)}</small></div></div>`).join('')}</div>`
     : '<div class="empty">Belum ada transaksi.</div>'}
   <div class="note"><a href="#" style="color:var(--main)" onclick="tampilTutup=!tampilTutup;tampil(LD);return false">${tampilTutup ? 'Sembunyikan' : 'Tampilkan'} saham yang sudah terjual</a></div>
   <div class="note">Harga dari Google Finance, bisa tertunda ±20 menit. Halaman ini hanya untuk melihat.</div>`;
